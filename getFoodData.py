@@ -1,5 +1,3 @@
-# import pandas as pd
-# import re
 import csv
 from collections import Counter
 from nltk.tokenize import RegexpTokenizer
