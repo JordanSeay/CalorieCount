@@ -127,3 +127,8 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Food Data
+foodData/
+problem3/
+recipes/
