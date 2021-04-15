@@ -34,6 +34,6 @@ def getFoodId(description, foodIdFilePath="foodData/input_food.csv"):
 
 def getNutrientAmount(foodId, nutrientId=2048, nutrientFilePath="foodData/food_nutrient.csv"):
     df = pd.read_csv(nutrientFilePath)
-    food_row = df.loc[df['fdc_id'] == foodId & df['nutrient_id'] == nutrientId]
+    food_row = df.loc[(df['fdc_id'] == foodId) & (df['nutrient_id'] == nutrientId)]
     nutrientAmt = food_row['amount'][:,0]
     return nutrientAmt
