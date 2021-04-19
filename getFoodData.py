@@ -59,44 +59,19 @@ def getFoodIdCsv(description, foodIdFilePath="foodData/input_food.csv"):
                 # print(bestMatch)
                 # print(descriptionTokensCount)
                 # print("\n")
-
+                
     return bestMatch
 
 
-def getNutrientAmount(foodId, nutrientId=2048, nutrientFilePath="foodData/food_nutrient.csv"):
-    df = pd.read_csv(nutrientFilePath)
+def getNutrientAmount(foodId, nutrientId=1008, nutrientFilePath="foodData/food_nutrient.csv"):
+    df = pd.read_csv(nutrientFilePath, low_memory=False)
     food_row = df.loc[(df['fdc_id'] == foodId) & (df['nutrient_id'] == nutrientId)]
-    nutrientAmt = food_row['amount']
+    nutrientAmt = food_row["amount"].iloc[0]
     return nutrientAmt
 
-def getNutrientAmount2(foodId, nutrientId=2048, nutrientFilePath="foodData/food_nutrient.csv"):
+def getNutrientAmount2(foodId, nutrientId='1008', nutrientFilePath="foodData/food_nutrient.csv"):
     openNutrientFile = open(nutrientFilePath)
     for row in csv.reader(openNutrientFile):
         if row[1] == foodId and row[2] == nutrientId:
             nutrientAmt = row[3]
-            return nutrientAmt
-
-
-testVal="tofu"
-start = time.time()
-foodId = getFoodIdDf(testVal)
-end = time.time()
-print("df time:", end - start)
-
-
-start = time.time()
-getFoodIdCsv(testVal)
-end = time.time()
-print("CSV time:",end - start)
-
-########
-start = time.time()
-getNutrientAmount(foodId)
-end = time.time()
-print("df time:", end - start)
-
-
-start = time.time()
-getNutrientAmount2(foodId)
-end = time.time()
-print("CSV time:",end - start)
+            return float(nutrientAmt)
