@@ -3,7 +3,6 @@ import os.path
 import shutil
 import argparse
 import numpy as np
-from tqdm import tqdm
 from getFoodData import getFoodIdCsv, getNutrientAmount, getNutrientAmount2
 
 
