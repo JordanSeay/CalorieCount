@@ -1,6 +1,9 @@
 import os
 import os.path
 import shutil
+import argparse
+import numpy as np
+from tqdm import tqdm
 from getFoodData import getFoodIdCsv, getNutrientAmount, getNutrientAmount2
 
 
@@ -39,6 +42,7 @@ def organize_recipes(path):
                             fullfilename, f"recipes/sweet_recipes/{filename}")
                     f.close()
 
+
 def walk_ingredients(path):
     f = open(path, "r", encoding="latin1")
     contents = f.read()
@@ -63,6 +67,7 @@ def walk_ingredients(path):
     f.close()
     return food_and_weights
 
+
 def parse_amount(line):
     # for volume measurements, I'm assuming density of water for now
     # food_portion has actual volume-to-gram conversions but that might be difficult
@@ -80,23 +85,100 @@ def parse_amount(line):
 
     return None
 
+
 def calorie_count(path):
     ingredients_and_amounts = walk_ingredients(path)
 
     calories = 0
     for ingredient, amount in ingredients_and_amounts:
         food_id = getFoodIdCsv(ingredient)
-        amt = getNutrientAmount(int(food_id))
-        calories += amt * (amount/100)
+        if food_id == "No Match":
+            pass
+        else:
+            amt = getNutrientAmount(int(food_id))
+            calories += amt * (amount/100)
 
     return calories
 
-if True:
-    """ overall script that runs examples """
+def count_all_recipes(path):
+    """
+    input: a directory to scrape for recipe.txt files
+    output: .npz file containing {recipe: calorie count} pairs
+    """
+    all_files = list(os.walk(path))
+    results = {}
 
-    # sign on
-    print("[[ Start! ]]\n")
+    for item in all_files:
+        foldername, _, lo_Files = item
+        for filename in lo_Files:
+                if filename[-3:] == "txt":
+                    results[filename] = calorie_count(foldername + "\\" + filename)
+                    print(f"recipe counted {filename}")
 
-    print(calorie_count("recipes/savory_recipes/vegetarian_recipes/recipe38.txt"))
+    np.savez_compressed("allCounts", **results)
 
-    print("\n[[ Fin. ]]")
+def filter_by_calorie(range):
+    """
+    input: List of size 2 with desired calorie range ex. [100, 2000]
+    output: list of all recipes in the desired calorie range
+    """
+    try:
+        calorie_counts = np.load("allCounts.npz")
+    except:
+        print("Cannot find file allCounts.npz \n Please run python .\exploreRecipes.py -s to generate allCounts.npz")
+
+    out = [] 
+    for key, value in calorie_counts.items():
+        calorieCount = int(value)
+        if calorieCount >= int(range[0]) and calorieCount <= int(range[1]):
+            out.append(key)
+    return out
+
+
+
+def main(args):
+    if args.saveFile is not None:
+        count_all_recipes(".\\problem3", args.saveFile)
+    if args.recipeName is not None:
+        print(calorie_count(f"{args.recipeName}"))
+    if args.filterByCalorie is not None:
+        print(filter_by_calorie(args.filterByCalorie))
+
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description='')
+    parser.add_argument(
+        '--saveFile',
+        '-s',
+        type=str,
+        help='Count calories of all recipes',
+    )
+    parser.add_argument(
+        '--recipeName',
+        '-n',
+        type=str,
+        help="Name of recipe file"
+    )
+    parser.add_argument(
+        '--filterByCalorie',
+        '-f',
+        type=int,
+        nargs=2,
+        help="Integers with desired calorie range (inclusive) of recipes ex. 100 2000 for range 100cal to 2000cal"
+    )
+    args = parser.parse_args()
+    main(args)    
+
+# Examples:
+#   To find all recipes that contain between 100 and 200 calories inclusively 
+#   run: python .\exploreRecipes.py -f 100 200
+#   returns: ['recipe25.txt', 'recipe37.txt', 'recipe127.txt', 'recipe159.txt', 'recipe169.txt', 'recipe201.txt']
+#   
+#   To find the calorie count of all recipes and store in allCounts.npz file 
+#   run: python .\exploreRecipes.py -s
+# 
+#   To find the calorie count of a given recipe
+#   run: python .\exploreRecipes.py -n recipes/savory_recipes/vegetarian_recipes/recipe38.txt
+#   returns: 6960.94584
