@@ -173,6 +173,7 @@ if __name__ == "__main__":
 
 # Examples:
 #   To find all recipes that contain between 100 and 200 calories inclusively 
+#   To save time this uses a precomputable calorie count file called allCounts.npz
 #   run: python .\exploreRecipes.py -f 100 200
 #   returns: ['recipe25.txt', 'recipe37.txt', 'recipe127.txt', 'recipe159.txt', 'recipe169.txt', 'recipe201.txt']
 #   
