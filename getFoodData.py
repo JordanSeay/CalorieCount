@@ -10,7 +10,6 @@ def getFoodIdDf(description, foodIdFilePath="foodData/input_food.csv"):
     colList = ["sr_description", "fdc_id"]
     df = pd.read_csv(foodIdFilePath, usecols=colList)
 
-    # print(description)
     tokenizer = RegexpTokenizer(r'\w+')
     inputDescriptionTokensCount = Counter(
         tokenizer.tokenize(description.lower()))
@@ -25,11 +24,6 @@ def getFoodIdDf(description, foodIdFilePath="foodData/input_food.csv"):
             if numMatches > maxMatches:
                 maxMatches = numMatches
                 bestMatch = row["fdc_id"]
-                # print("\n")
-                # print(description)
-                # print(bestMatch)
-                # print(descriptionTokensCount)
-                # print("\n")
 
     return bestMatch
 
@@ -37,7 +31,6 @@ def getFoodIdDf(description, foodIdFilePath="foodData/input_food.csv"):
 def getFoodIdCsv(description, foodIdFilePath="foodData/input_food.csv"):
     openFoodIdFile = open(foodIdFilePath)
 
-    # print(description)
     tokenizer = RegexpTokenizer(r'\w+')
     inputDescriptionTokensCount = Counter(
         tokenizer.tokenize(description.lower()))
@@ -45,20 +38,13 @@ def getFoodIdCsv(description, foodIdFilePath="foodData/input_food.csv"):
     bestMatch = "No Match"
 
     for row in csv.reader(openFoodIdFile):
-        # descriptionTokens = re.split("_|, | |-|!", row[2]) #Reg ex tokenizer
         descriptionTokensCount = Counter(tokenizer.tokenize(row[6].lower()))
-        # print(descriptionTokensCount)
         matches = descriptionTokensCount & inputDescriptionTokensCount
         if len(descriptionTokensCount) > 0:
             numMatches = sum(matches.values()) / len(descriptionTokensCount)
             if numMatches > maxMatches:
                 maxMatches = numMatches
                 bestMatch = row[1]
-                # print("\n")
-                # print(description)
-                # print(bestMatch)
-                # print(descriptionTokensCount)
-                # print("\n")
                 
     return bestMatch
 
