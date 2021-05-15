@@ -180,7 +180,7 @@ def filter_by_ingredients(ingredients, subset=False):
 
 def main(args):
     if args.saveFile is not None:
-        count_all_recipes("test")
+        count_all_recipes(".\\problem3")
     if args.recipeName is not None:
         print(calorie_count(f"{args.recipeName}"))
     if args.filterByCalorie is not None:
@@ -198,8 +198,8 @@ if __name__ == "__main__":
     parser.add_argument(
         '--saveFile',
         '-s',
-        type=str,
-        help='Count calories of all recipes',
+        action='store_true',
+        help='Count calories and ingredients of all recipes',
     )
     parser.add_argument(
         '--recipeName',
